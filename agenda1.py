@@ -43,12 +43,19 @@ def adicionar(descricao, extras):
 
   # não é possível adicionar uma atividade que não possui descrição. 
   if descricao  == '' :
-    return False
-  
-
-  ################ COMPLETAR
-
-
+    return False  
+  novaAtividade = ''
+  if dataValida(extras[0]):
+    novaAtividade = novaAtividade +' '+ extras[0]
+  if horaValida(extras[1]):
+    novaAtividade = novaAtividade +' '+ extras[1]
+  if prioridadeValida(extras[2]):
+    novaAtividade = novaAtividade +' '+ extras[2]
+  novaAtividade = novaAtividade +' '+ descricao
+  if contextoValido(extras[3]):
+    novaAtividade = novaAtividade +' '+ extras[3]
+  if projetoValido(extras[4]):
+    novaAtividade = novaAtividade +' '+ extras[4]
   # Escreve no TODO_FILE. 
   try: 
     fp = open(TODO_FILE, 'a')
@@ -64,43 +71,51 @@ def adicionar(descricao, extras):
 
 # Valida a prioridade.
 def prioridadeValida(pri):
-
-  ################ COMPLETAR
-  
+  alfabeto = 'abcdefghijklmnopqrstuvwxyz'
+  if len(pri) != 3 or pri[0] != '(' or pri[2] != ')':
+    return False
+  for x in alfabeto:
+    if pri[1] == x:
+      return True
+  for x in alfabeto.upper():
+    if pri[1] == x:
+      return True
   return False
-
 
 # Valida a hora. Consideramos que o dia tem 24 horas, como no Brasil, ao invés
 # de dois blocos de 12 (AM e PM), como nos EUA.
 def horaValida(horaMin) :
   if len(horaMin) != 4 or not soDigitos(horaMin):
     return False
-  else:
-    ################ COMPLETAR
-    return True
+  elif horaMin[0] > '2' or (horaMin[0] == '2' and horaMin[1] > '3') or horaMin[2] > '5':
+    return False
+  return True
 
 # Valida datas. Verificar inclusive se não estamos tentando
 # colocar 31 dias em fevereiro. Não precisamos nos certificar, porém,
 # de que um ano é bissexto. 
 def dataValida(data) :
-
-  ################ COMPLETAR
-
-  return False
-
+  if len(data) != 8 or not soDigitos(data):
+    return False
+  elif data[0] > '3' or (data[0] == '3' and data[1] > '1') or data[2] > '1' or (data[2] == '1' and data[3] > '2'):
+    return False
+  elif (data[0] == '3' and data[1] == '1' and data[2] == '0' and (data[3] == '4' or data[3] == '6' or data[3] == '9')):
+    return False
+  elif (data[0] == '3' and data[1] == '1' and data[2] == '1' and data[3] == '1') or (data[0] > '2' and data[2] == '0' and data[3] == '2'):
+    return False
+  return True
+  
 # Valida que o string do projeto está no formato correto. 
 def projetoValido(proj):
-
-  ################ COMPLETAR
-
-  return False
+  if len(proj) < 2 or proj[0] != '+':
+    return False
+  return True
 
 # Valida que o string do contexto está no formato correto. 
 def contextoValido(cont):
-
-  ################ COMPLETAR
-
-  return False
+  if len(cont) < 2 or cont[0] != '@':
+    return False
+  return True
 
 # Valida que a data ou a hora contém apenas dígitos, desprezando espaços
 # extras no início e no fim.
@@ -117,7 +132,7 @@ def soDigitos(numero) :
 # uma lista de tuplas contendo os pedaços de cada linha, conforme o seguinte
 # formato:
 #
-# (descrição, prioridade, (data, hora, contexto, projeto))
+# (descrição, (data, hora, prioridade,  contexto, projeto))
 #
 # É importante lembrar que linhas do arquivo todo.txt devem estar organizadas de acordo com o
 # seguinte formato:
@@ -131,10 +146,10 @@ def organizar(linhas):
   itens = []
 
   for l in linhas:
+    desc = ''
     data = '' 
     hora = ''
     pri = ''
-    desc = ''
     contexto = ''
     projeto = ''
   
@@ -150,7 +165,24 @@ def organizar(linhas):
     # corresponde à descrição. É só transformar a lista de tokens em um string e
     # construir a tupla com as informações disponíveis. 
 
-    ################ COMPLETAR
+    for x in tokens:
+      if dataValida(x):
+        data = x
+        tokens.remove(x)
+      elif horaValida(x):
+        hora = x
+        tokens.remove(x)
+      elif prioridadeValida(x):
+        pri = x
+        tokens.remove(x)
+      elif contextoValido(x):
+        contexto = x
+        tokens.remove(x)
+      elif projetoValido(x):
+        projeto = x
+        tokens.remove(x)
+      else:
+        desc = desc +' '+ x
 
     itens.append((desc, (data, hora, pri, contexto, projeto)))
 
@@ -249,4 +281,4 @@ def processarComandos(comandos) :
 # sys.argv terá como conteúdo
 #
 # ['agenda.py', 'a', 'Mudar', 'de', 'nome']
-processarComandos(sys.argv)
+#processarComandos(sys.argv)
