@@ -71,7 +71,7 @@ def adicionar(descricao, extras):
 
 # Valida a prioridade.
 def prioridadeValida(pri):
-  alfabeto = 'abcdefghijklmnopqrstuvxyz'
+  alfabeto = 'abcdefghijklmnopqrstuvwxyz'
   if len(pri) != 3 or pri[0] != '(' or pri[2] != ')':
     return False
   for x in alfabeto:
