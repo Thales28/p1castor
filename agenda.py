@@ -46,16 +46,16 @@ def adicionar(descricao, extras):
     return False  
   novaAtividade = ''
   if dataValida(extras[0]):
-    novaAtividade = novaAtividade +' '+ extras[0]
+    novaAtividade = novaAtividade + extras[0]+' '
   if horaValida(extras[1]):
-    novaAtividade = novaAtividade +' '+ extras[1]
+    novaAtividade = novaAtividade + extras[1]+' '
   if prioridadeValida(extras[2]):
-    novaAtividade = novaAtividade +' '+ extras[2]
-  novaAtividade = novaAtividade +' '+ descricao
+    novaAtividade = novaAtividade + extras[2]+' '
+  novaAtividade = novaAtividade + descricao+' '
   if contextoValido(extras[3]):
-    novaAtividade = novaAtividade +' '+ extras[3]
+    novaAtividade = novaAtividade + extras[3]+' '
   if projetoValido(extras[4]):
-    novaAtividade = novaAtividade +' '+ extras[4]
+    novaAtividade = novaAtividade + extras[4]+' '
   # Escreve no TODO_FILE. 
   try: 
     fp = open(TODO_FILE, 'a')
@@ -182,7 +182,7 @@ def organizar(linhas):
         projeto = x
         tokens.remove(x)
       else:
-        desc = desc +' '+ x
+        desc = x
 
     itens.append((desc, (data, hora, pri, contexto, projeto)))
 
@@ -247,12 +247,14 @@ def processarComandos(comandos) :
     comandos.pop(0) # remove 'agenda.py'
     comandos.pop(0) # remove 'adicionar'
     itemParaAdicionar = organizar([' '.join(comandos)])[0]
-    # itemParaAdicionar = (descricao, prioridade, (data, hora, contexto, projeto))
+    # itemParaAdicionar = (descricao, (data, hora, prioridade, contexto, projeto))
     adicionar(itemParaAdicionar[0], itemParaAdicionar[1]) # novos itens não têm prioridade
   elif comandos[1] == LISTAR:
-    return    
-    ################ COMPLETAR
-
+    comandos.pop(0) # remove 'agenda.py'
+    comandos.pop(0) # remove 'listar'
+    itemParaListar = organizar([' '.join(comandos)])[0]
+    # itemParaListar = (descricao, (data, hora, prioridade, contexto, projeto))
+    listar(itemParaListar[0], itemParaListar[1]) # novos itens não têm prioridade
   elif comandos[1] == REMOVER:
     return    
 
