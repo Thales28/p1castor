@@ -202,12 +202,14 @@ def ordenarPorDataHora(itens):
   while i < len(itens):
     j = 0
     while j < (len(itens)-1):
+      #Casos em que eu automaticamente quero que percam prioridade: Sem data e hora OU se houver data, porém se o próximo ítem tiver apenas hora:
       if ((itens[j][1][0] == '') and (itens[j][1][1] == '')) or ((itens[j][1][0] != '') and ((itens[j+1][1][0] == '') and (itens[j+1][1][1] != ''))):
         temporaria = itens[j]
         itens[j] = itens[j+1]
         itens[j+1] = temporaria
       elif (itens[j][1][0] != '') and (itens[j+1][1][0] != ''):
-        if (itens[j][1][0][4:] > itens[j+1][1][0][4:]):
+        #Se o ítem sendo visto e o próximo tiverem datas, nós vamos compará-las para saber qual a maior para perder prioridade:
+        if (itens[j][1][0][4:] > itens[j+1][1][0][4:]): # ([j]:ítem conforme o contador)([1]:posição na tupla em que tão os extras)([0]:posição das datas na tupla)([4:]:pegando apenas o ano da data)
           temporaria = itens[j]
           itens[j] = itens[j+1]
           itens[j+1] = temporaria
@@ -219,11 +221,12 @@ def ordenarPorDataHora(itens):
           temporaria = itens[j]
           itens[j] = itens[j+1]
           itens[j+1] = temporaria
-        elif (itens[j][1][0] == itens[j+1][1][0]) and (itens[j][1][1] == ''):
+        elif (itens[j][1][0] == itens[j+1][1][0]) and (itens[j][1][1] == ''):#se as datas forem iguais, mas o ítem do contador não tiver hora ele perde prioridade.
           temporaria = itens[j]
           itens[j] = itens[j+1]
           itens[j+1] = temporaria
         elif (itens[j][1][0] == itens[j+1][1][0]) and (itens[j][1][1] != '') and (itens[j+1][1][1] != ''):
+          #Caso as datas sejam iguais, mas os ítens possuam hora, nós iremos compará-las:
           if (itens[j][1][1][:2] > itens[j+1][1][1][:2]):
             temporaria = itens[j]
             itens[j] = itens[j+1]
@@ -233,6 +236,7 @@ def ordenarPorDataHora(itens):
             itens[j] = itens[j+1]
             itens[j+1] = temporaria
       elif (itens[j][1][0] == '') and (itens[j][1][1] != '') and (itens[j+1][1][0] == '') and (itens[j+1][1][1] != ''):
+        #Caso os ítens possuam apenas horas:
         if itens[j][1][1][:2] > itens[j+1][1][1][:2]:
           temporaria = itens[j]
           itens[j] = itens[j+1]
