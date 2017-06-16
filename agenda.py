@@ -166,23 +166,18 @@ def organizar(linhas):
     # construir a tupla com as informações disponíveis. 
 
     for x in tokens:
-      if dataValida(x):
+      if (data == '') and dataValida(x):
         data = x
-        tokens.remove(x)
-      elif horaValida(x):
+      elif (hora == '') and horaValida(x):
         hora = x
-        tokens.remove(x)
-      elif prioridadeValida(x):
+      elif (pri == '') and prioridadeValida(x):
         pri = x
-        tokens.remove(x)
-      elif contextoValido(x):
+      elif (contexto == '') and contextoValido(x):
         contexto = x
-        tokens.remove(x)
-      elif projetoValido(x):
+      elif (projeto == '') and projetoValido(x):
         projeto = x
-        tokens.remove(x)
       else:
-        desc = x
+        desc = desc + x + ' '
 
     itens.append((desc, (data, hora, pri, contexto, projeto)))
 
@@ -197,14 +192,57 @@ def organizar(linhas):
 # determinado projeto; (vi) atividades de determinado dia (data específica, hoje ou amanhã). Isso não
 # é uma das tarefas básicas do projeto, porém. 
 def listar():
-
-  ################ COMPLETAR
-  return 
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  return organizar(linhas)
 
 def ordenarPorDataHora(itens):
-
-  ################ COMPLETAR
-
+  i = 0
+  while i < len(itens):
+    j = 0
+    while j < (len(itens)-1):
+      if ((itens[j][1][0] == '') and (itens[j][1][1] == '')) or ((itens[j][1][0] != '') and ((itens[j+1][1][0] == '') and (itens[j+1][1][1] != ''))):
+        temporaria = itens[j]
+        itens[j] = itens[j+1]
+        itens[j+1] = temporaria
+      elif (itens[j][1][0] != '') and (itens[j+1][1][0] != ''):
+        if (itens[j][1][0][4:] > itens[j+1][1][0][4:]):
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+        elif (itens[j][1][0][4:] == itens[j+1][1][0][4:]) and (itens[j][1][0][2:4] > itens[j+1][1][0][2:4]):
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+        elif (itens[j][1][0][2:] == itens[j+1][1][0][2:]) and (itens[j][1][0][:2] > itens[j+1][1][0][:2]):
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+        elif (itens[j][1][0] == itens[j+1][1][0]) and (itens[j][1][1] == ''):
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+        elif (itens[j][1][0] == itens[j+1][1][0]) and (itens[j][1][1] != '') and (itens[j+1][1][1] != ''):
+          if (itens[j][1][1][:2] > itens[j+1][1][1][:2]):
+            temporaria = itens[j]
+            itens[j] = itens[j+1]
+            itens[j+1] = temporaria
+          elif (itens[j][1][1][:2] == itens[j+1][1][1][:2]) and (itens[j][1][1][2:] > itens[j+1][1][1][2:]):
+            temporaria = itens[j]
+            itens[j] = itens[j+1]
+            itens[j+1] = temporaria
+      elif (itens[j][1][0] == '') and (itens[j][1][1] != '') and (itens[j+1][1][0] == '') and (itens[j+1][1][1] != ''):
+        if itens[j][1][1][:2] > itens[j+1][1][1][:2]:
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+        elif (itens[j][1][0][2:] == itens[j+1][1][0][2:]) and (itens[j][1][0][:2] > itens[j+1][1][0][:2]):
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+      j = j+1
+    i = i+1
   return itens
    
 def ordenarPorPrioridade(itens):
