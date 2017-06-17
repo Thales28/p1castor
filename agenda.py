@@ -197,10 +197,31 @@ def listar():
   linhas = fp.readlines()
   fp.close()
   linhasOrdenadas = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
-  listaStrings = []
+  texto = ''
+  i = 0
   for x in linhasOrdenadas:
-    listaStrings = listaStrings + [x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4] + '\n']
-  return listaStrings
+    if x[1][2] == '(A)':      
+      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+      texto = texto.strip()
+      printCores(str(i+1)+' '+texto, RED + BOLD)
+    elif x[1][2] == '(B)':
+      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+      texto = texto.strip()
+      printCores(str(i+1)+' '+texto, YELLOW)
+    elif x[1][2] == '(C)':
+      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+      texto = texto.strip()
+      printCores(str(i+1)+' '+texto, GREEN)
+    elif x[1][2] == '(D)':
+      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+      texto = texto.strip()
+      printCores(str(i+1)+' '+texto, CYAN)
+    else:
+      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+      texto = texto.strip()
+      print(str(i+1)+' '+texto)
+    i = i + 1
+  return
 
 def ordenarPorDataHora(itens):
   i = 0
