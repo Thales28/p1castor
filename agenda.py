@@ -50,6 +50,7 @@ def adicionar(descricao, extras):
   if horaValida(extras[1]):
     novaAtividade = novaAtividade + extras[1]+' '
   if prioridadeValida(extras[2]):
+    extras[2] = extras[2][0] + extras[2][1].upper() + extras[2][2]
     novaAtividade = novaAtividade + extras[2]+' '
   novaAtividade = novaAtividade + descricao+' '
   if contextoValido(extras[3]):
@@ -171,7 +172,7 @@ def organizar(linhas):
       elif (hora == '') and horaValida(x):
         hora = x
       elif (pri == '') and prioridadeValida(x):
-        pri = x
+        pri = x[0] + x[1].upper() + x[2]
       elif (contexto == '') and contextoValido(x):
         contexto = x
       elif (projeto == '') and projetoValido(x):
@@ -195,15 +196,34 @@ def listar():
   fp = open(TODO_FILE, 'r')
   linhas = fp.readlines()
   fp.close()
-  return organizar(linhas)
+  linhasOrdenadas = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  listaStrings = []
+  for x in linhasOrdenadas:
+    listaStrings = listaStrings + [x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4] + '\n']
+  return listaStrings
 
 def ordenarPorDataHora(itens):
   i = 0
   while i < len(itens):
     j = 0
     while j < (len(itens)-1):
-      #Casos em que eu automaticamente quero que percam prioridade: Sem data e hora OU se houver data, porém se o próximo ítem tiver apenas hora:
-      if ((itens[j][1][0] == '') and (itens[j][1][1] == '')) or ((itens[j][1][0] != '') and ((itens[j+1][1][0] == '') and (itens[j+1][1][1] != ''))):
+      #Casos em que eu automaticamente quero que percam prioridade: Sem data e hora:
+      if ((itens[j][1][0] == '') and (itens[j][1][1] == '')):
+        temporaria = itens[j]
+        itens[j] = itens[j+1]
+        itens[j+1] = temporaria
+      elif (itens[j][1][0] == '') and (itens[j][1][1] != '') and (itens[j+1][1][0] == '') and (itens[j+1][1][1] != ''):
+        #Caso os ítens possuam apenas horas:
+        if itens[j][1][1][:2] > itens[j+1][1][1][:2]:
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+        elif (itens[j][1][0][2:] == itens[j+1][1][0][2:]) and (itens[j][1][0][:2] > itens[j+1][1][0][:2]):
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+      elif (itens[j][1][0] == '') and (itens[j][1][1] != '') and (itens[j+1][1][0] != ''):
+        #Se houver apenas hora, porém se o próximo ítem tiver data:
         temporaria = itens[j]
         itens[j] = itens[j+1]
         itens[j+1] = temporaria
@@ -221,7 +241,8 @@ def ordenarPorDataHora(itens):
           temporaria = itens[j]
           itens[j] = itens[j+1]
           itens[j+1] = temporaria
-        elif (itens[j][1][0] == itens[j+1][1][0]) and (itens[j][1][1] == ''):#se as datas forem iguais, mas o ítem do contador não tiver hora ele perde prioridade.
+        elif (itens[j][1][0] == itens[j+1][1][0]) and (itens[j][1][1] == ''):
+          #se as datas forem iguais, mas o ítem do contador não tiver hora ele perde prioridade.
           temporaria = itens[j]
           itens[j] = itens[j+1]
           itens[j+1] = temporaria
@@ -235,23 +256,29 @@ def ordenarPorDataHora(itens):
             temporaria = itens[j]
             itens[j] = itens[j+1]
             itens[j+1] = temporaria
-      elif (itens[j][1][0] == '') and (itens[j][1][1] != '') and (itens[j+1][1][0] == '') and (itens[j+1][1][1] != ''):
-        #Caso os ítens possuam apenas horas:
-        if itens[j][1][1][:2] > itens[j+1][1][1][:2]:
-          temporaria = itens[j]
-          itens[j] = itens[j+1]
-          itens[j+1] = temporaria
-        elif (itens[j][1][0][2:] == itens[j+1][1][0][2:]) and (itens[j][1][0][:2] > itens[j+1][1][0][:2]):
-          temporaria = itens[j]
-          itens[j] = itens[j+1]
-          itens[j+1] = temporaria
       j = j+1
     i = i+1
   return itens
    
 def ordenarPorPrioridade(itens):
 
-  ################ COMPLETAR
+  i=0
+  while i < len(itens):
+    j=0
+    while j < (len(itens)-1):
+      #Se não houver prioridade, trocar apenas se o próximo tiver prioridade para nao mexer na ordenarPorDataHora(itens):
+      if (itens[j][1][2] == '') and (itens[j+1][1][2] != ''):
+        temporaria = itens[j]
+        itens[j] = itens[j+1]
+        itens[j+1] = temporaria
+      elif (itens[j][1][2] != '') and (itens[j+1][1][2] != ''):
+        #Se existir prioridade nos dois, comparar só a letra:
+        if itens[j][1][2][1] > itens[j+1][1][2][1]:
+          temporaria = itens[j]
+          itens[j] = itens[j+1]
+          itens[j+1] = temporaria
+      j=j+1
+    i=i+1
 
   return itens
 
@@ -292,11 +319,8 @@ def processarComandos(comandos) :
     # itemParaAdicionar = (descricao, (data, hora, prioridade, contexto, projeto))
     adicionar(itemParaAdicionar[0], itemParaAdicionar[1]) # novos itens não têm prioridade
   elif comandos[1] == LISTAR:
-    comandos.pop(0) # remove 'agenda.py'
-    comandos.pop(0) # remove 'listar'
-    itemParaListar = organizar([' '.join(comandos)])[0]
-    # itemParaListar = (descricao, (data, hora, prioridade, contexto, projeto))
-    listar(itemParaListar[0], itemParaListar[1]) # novos itens não têm prioridade
+    return listar()
+  
   elif comandos[1] == REMOVER:
     return    
 
