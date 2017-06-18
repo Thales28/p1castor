@@ -87,13 +87,13 @@ def adicionarFeito(descricao, extras):
     novaAtividade = novaAtividade + extras[3]+' '
   if projetoValido(extras[4]):
     novaAtividade = novaAtividade + extras[4]+' '
-  # Escreve no TODO_FILE. 
+  # Escreve no 'done.txt'. 
   try: 
     fp = open('done.txt', 'a')
     fp.write(novaAtividade + "\n")
     fp.close()
   except IOError as err:
-    print("Não foi possível escrever para o arquivo done.txt")
+    print("Não foi possível escrever para o arquivo 'done.txt'")
     print(err)
     return False
 
