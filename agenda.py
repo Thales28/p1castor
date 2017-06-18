@@ -25,6 +25,7 @@ LISTAR = 'l'
 
 def printCores(texto, cor) :
   print(cor + texto + RESET)
+  return
   
 
 # Adiciona um compromisso à agenda. Um compromisso tem no mínimo
@@ -50,8 +51,8 @@ def adicionar(descricao, extras):
   if horaValida(extras[1]):
     novaAtividade = novaAtividade + extras[1]+' '
   if prioridadeValida(extras[2]):
-    extras[2] = extras[2][0] + extras[2][1].upper() + extras[2][2]
-    novaAtividade = novaAtividade + extras[2]+' '
+    prioridade = '(' + extras[2][1].upper() + ')'
+    novaAtividade = novaAtividade + prioridade +' '
   novaAtividade = novaAtividade + descricao+' '
   if contextoValido(extras[3]):
     novaAtividade = novaAtividade + extras[3]+' '
@@ -68,7 +69,35 @@ def adicionar(descricao, extras):
     return False
 
   return True
+def adicionarFeito(descricao, extras):
 
+  # não é possível adicionar uma atividade que não possui descrição. 
+  if descricao  == '' :
+    return False  
+  novaAtividade = ''
+  if dataValida(extras[0]):
+    novaAtividade = novaAtividade + extras[0]+' '
+  if horaValida(extras[1]):
+    novaAtividade = novaAtividade + extras[1]+' '
+  if prioridadeValida(extras[2]):
+    extras[2] = extras[2][0] + extras[2][1].upper() + extras[2][2]
+    novaAtividade = novaAtividade + extras[2]+' '
+  novaAtividade = novaAtividade + descricao+' '
+  if contextoValido(extras[3]):
+    novaAtividade = novaAtividade + extras[3]+' '
+  if projetoValido(extras[4]):
+    novaAtividade = novaAtividade + extras[4]+' '
+  # Escreve no TODO_FILE. 
+  try: 
+    fp = open('done.txt', 'a')
+    fp.write(novaAtividade + "\n")
+    fp.close()
+  except IOError as err:
+    print("Não foi possível escrever para o arquivo done.txt")
+    print(err)
+    return False
+
+  return True
 
 # Valida a prioridade.
 def prioridadeValida(pri):
@@ -196,30 +225,94 @@ def listar():
   fp = open(TODO_FILE, 'r')
   linhas = fp.readlines()
   fp.close()
-  linhasOrdenadas = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
   texto = ''
-  i = 0
-  for x in linhasOrdenadas:
-    if x[1][2] == '(A)':      
-      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
-      texto = texto.strip()
-      printCores(str(i+1)+' '+texto, RED + BOLD)
-    elif x[1][2] == '(B)':
-      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
-      texto = texto.strip()
-      printCores(str(i+1)+' '+texto, YELLOW)
-    elif x[1][2] == '(C)':
-      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
-      texto = texto.strip()
-      printCores(str(i+1)+' '+texto, GREEN)
-    elif x[1][2] == '(D)':
-      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
-      texto = texto.strip()
-      printCores(str(i+1)+' '+texto, CYAN)
-    else:
-      texto = x[1][2] +' '+ x[1][0] +' '+ x[1][1] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
-      texto = texto.strip()
-      print(str(i+1)+' '+texto)
+  i = 1
+  for x in listaOrdenada:
+    if (x[1][0] != '') and (x[1][1] != ''):#colocando os separadores de data e hora:
+      if x[1][2] == '(A)':   
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, RED + BOLD)
+      elif x[1][2] == '(B)':
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, YELLOW)
+      elif x[1][2] == '(C)':
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, GREEN)
+      elif x[1][2] == '(D)':
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, CYAN)
+      else:
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        print(str(i)+' '+texto)
+    elif (x[1][0] == '') and (x[1][1] != ''):
+      if x[1][2] == '(A)':   
+        texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, RED + BOLD)
+      elif x[1][2] == '(B)':
+        texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, YELLOW)
+      elif x[1][2] == '(C)':
+        texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, GREEN)
+      elif x[1][2] == '(D)':
+        texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, CYAN)
+      else:
+        texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        print(str(i)+' '+texto)
+    elif (x[1][0] != '') and (x[1][1] == ''):
+      if x[1][2] == '(A)':   
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, RED + BOLD)
+      elif x[1][2] == '(B)':
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, YELLOW)
+      elif x[1][2] == '(C)':
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, GREEN)
+      elif x[1][2] == '(D)':
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, CYAN)
+      else:
+        texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        print(str(i)+' '+texto)
+    elif (x[1][0] == '') and (x[1][1] == ''):
+      if x[1][2] == '(A)':   
+        texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, RED + BOLD)
+      elif x[1][2] == '(B)':
+        texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, YELLOW)
+      elif x[1][2] == '(C)':
+        texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, GREEN)
+      elif x[1][2] == '(D)':
+        texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        printCores(str(i)+' '+texto, CYAN)
+      else:
+        texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+        texto = texto.strip()
+        print(str(i)+' '+texto)
     i = i + 1
   return
 
@@ -277,8 +370,8 @@ def ordenarPorDataHora(itens):
             temporaria = itens[j]
             itens[j] = itens[j+1]
             itens[j+1] = temporaria
-      j = j+1
-    i = i+1
+      j = (j+1)
+    i = (i+1)
   return itens
    
 def ordenarPorPrioridade(itens):
@@ -298,21 +391,42 @@ def ordenarPorPrioridade(itens):
           temporaria = itens[j]
           itens[j] = itens[j+1]
           itens[j+1] = temporaria
-      j=j+1
-    i=i+1
+      j=(j+1)
+    i=(i+1)
 
   return itens
 
 def fazer(num):
 
-  ################ COMPLETAR
-
+  num = (int(num)-1)
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  if num > len(linhas) or num < 0:
+    print("Não existe atividade com o número " + str(num + 1)+ " na lista")
+    return
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  adicionarFeito(listaOrdenada[num][0], listaOrdenada[num][1])
+  num = str(num+1)
+  remover(num)
   return 
 
-def remover():
-
-  ################ COMPLETAR
-
+def remover(num):
+  num = (int(num) - 1)
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  if num > len(linhas) or num < 0:
+    print("Não existe atividade com o número " + str(num + 1)+ " na lista")
+    return
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  listaOrdenada.pop(num)
+  #pra limpar o arquivo
+  fp = open(TODO_FILE, 'w')
+  fp.close()
+  #Agora criar um novo arquivo sem a atividade
+  for x in listaOrdenada:
+    adicionar(x[0], x[1])
   return
 
 # prioridade é uma letra entre A a Z, onde A é a mais alta e Z a mais baixa.
@@ -320,7 +434,25 @@ def remover():
 # exibido pelo comando 'l'. 
 def priorizar(num, prioridade):
 
-  ################ COMPLETAR
+  num = (int(num)- 1)
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  if num > len(linhas) or num < 0:
+    print("Não existe atividade com o número " + str(num + 1)+ " na lista")
+    return
+  #adicionar à lista a atividade modificada e depois remover a atividade 
+  listaOrdenada.append((listaOrdenada[num][0], (listaOrdenada[num][1][0], listaOrdenada[num][1][1], prioridade, listaOrdenada[num][1][3], listaOrdenada[num][1][4])))
+  listaOrdenada.pop(num)
+  #pra limpar o arquivo
+  fp = open(TODO_FILE, 'w')
+  fp.close()
+  #Agora criar um novo arquivo com a atividade modificada
+  for x in listaOrdenada:
+    adicionar(x[0], x[1])
+
+  
 
   return 
 
@@ -340,25 +472,37 @@ def processarComandos(comandos) :
     # itemParaAdicionar = (descricao, (data, hora, prioridade, contexto, projeto))
     adicionar(itemParaAdicionar[0], itemParaAdicionar[1]) # novos itens não têm prioridade
   elif comandos[1] == LISTAR:
-    return listar()
+    listar()
+    return
   
   elif comandos[1] == REMOVER:
-    return    
-
-    ################ COMPLETAR    
+    comandos.pop(0) # remove 'agenda.py'
+    comandos.pop(0) # remove 'remover'
+    num = comandos[0]
+    # num é o número da lista a ser removido
+    remover(num)
+    return
 
   elif comandos[1] == FAZER:
-    return    
-
-    ################ COMPLETAR
+    comandos.pop(0) # remove 'agenda.py'
+    comandos.pop(0) # remove 'fazer'
+    N = comandos[0]
+    fazer(N)
+    return
 
   elif comandos[1] == PRIORIZAR:
-    return    
-
-    ################ COMPLETAR
-
+    comandos.pop(0) # remove 'agenda.py'
+    comandos.pop(0) # remove 'priorizar'
+    num = comandos[0]
+    prioridade = ('('+ comandos[1]+ ')')
+    if prioridadeValida(prioridade):
+      priorizar(num, prioridade)
+      return
+    print('Prioriade Inválida.')
+    return  
   else :
     print("Comando inválido.")
+    return
     
   
 # sys.argv é uma lista de strings onde o primeiro elemento é o nome do programa
@@ -370,4 +514,4 @@ def processarComandos(comandos) :
 # sys.argv terá como conteúdo
 #
 # ['agenda.py', 'a', 'Mudar', 'de', 'nome']
-#processarComandos(sys.argv)
+processarComandos(sys.argv)
