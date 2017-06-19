@@ -472,7 +472,21 @@ def processarComandos(comandos) :
     # itemParaAdicionar = (descricao, (data, hora, prioridade, contexto, projeto))
     adicionar(itemParaAdicionar[0], itemParaAdicionar[1]) # novos itens não têm prioridade
   elif comandos[1] == LISTAR:
-    listar()
+    comandos.pop(0) # remove 'agenda.py'
+    comandos.pop(0) # remove 'listar'
+    if len(comandos) == 0:
+      listar()
+    if len(comandos) == 1:
+      if prioridadeValida(comandos[0]):
+        listarPrioridade(comandos[0])
+      elif contextoValido(comandos[0]):
+        listarContexto(comandos[0])
+      elif projetoValido(comandos[0]):
+        listarProjeto(comandos[0])
+      elif dataValida(comandos[0]):
+        listarData(comandos[0])
+      else:
+        print('comando inválido.')
     return
   
   elif comandos[1] == REMOVER:
@@ -503,7 +517,271 @@ def processarComandos(comandos) :
   else :
     print("Comando inválido.")
     return
-    
+
+def listarPrioridade(pri):
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  texto = ''
+  pri = '('+ pri[1].upper() +')'
+  for x in listaOrdenada:
+    if x[1][2] == pri:
+      if (x[1][0] != '') and (x[1][1] != ''):#colocando os separadores de data e hora:
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] == '') and (x[1][1] != ''):
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] != '') and (x[1][1] == ''):
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] == '') and (x[1][1] == ''):
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+  return
+def listarContexto(contexto):
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  texto = ''
+  for x in listaOrdenada:
+    if x[1][3].lower() == contexto.lower():
+      if (x[1][0] != '') and (x[1][1] != ''):#colocando os separadores de data e hora:
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] == '') and (x[1][1] != ''):
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] != '') and (x[1][1] == ''):
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] == '') and (x[1][1] == ''):
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+  return
+def listarProjeto(projeto):
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  texto = ''
+  for x in listaOrdenada:
+    if x[1][4].lower() == projeto.lower():
+      if (x[1][0] != '') and (x[1][1] != ''):#colocando os separadores de data e hora:
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] == '') and (x[1][1] != ''):
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] != '') and (x[1][1] == ''):
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] == '') and (x[1][1] == ''):
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+  return
+def listarData(data):
+  fp = open(TODO_FILE, 'r')
+  linhas = fp.readlines()
+  fp.close()
+  listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
+  texto = ''
+  for x in listaOrdenada:
+    if x[1][0] == data:
+      if (x[1][0] != '') and (x[1][1] != ''):#colocando os separadores de data e hora:
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[1][1][:2]+'h'+x[1][1][2:]+'m '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+      elif (x[1][0] != '') and (x[1][1] == ''):
+        if x[1][2] == '(A)':   
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, RED + BOLD)
+        elif x[1][2] == '(B)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, YELLOW)
+        elif x[1][2] == '(C)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, GREEN)
+        elif x[1][2] == '(D)':
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          printCores(texto, CYAN)
+        else:
+          texto = x[1][2] +' '+ x[1][0][:2]+'/'+x[1][0][2:4]+'/'+x[1][0][4:] +' '+ x[0] +' '+ x[1][3] +' '+ x[1][4]
+          texto = texto.strip()
+          print(texto)
+  return
+
   
 # sys.argv é uma lista de strings onde o primeiro elemento é o nome do programa
 # invocado a partir da linha de comando e os elementos restantes são tudo que
