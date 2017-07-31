@@ -64,7 +64,7 @@ def adicionar(descricao, extras):
     fp.write(novaAtividade + "\n")
     fp.close()
   except IOError as err:
-    print("Não foi possível escrever para o arquivo " + TODO_FILE)
+    print("Nao foi possivel escrever para o arquivo " + TODO_FILE)
     print(err)
     return False
 
@@ -80,7 +80,7 @@ def adicionarFeito(descricao, extras):
   if horaValida(extras[1]):
     novaAtividade = novaAtividade + extras[1]+' '
   if prioridadeValida(extras[2]):
-    extras[2] = extras[2][0] + extras[2][1].upper() + extras[2][2]
+    prioridade = '(' + extras[2][1].upper() + ')'
     novaAtividade = novaAtividade + extras[2]+' '
   novaAtividade = novaAtividade + descricao+' '
   if contextoValido(extras[3]):
@@ -93,7 +93,7 @@ def adicionarFeito(descricao, extras):
     fp.write(novaAtividade + "\n")
     fp.close()
   except IOError as err:
-    print("Não foi possível escrever para o arquivo 'done.txt'")
+    print("Nao foi possivel escrever para o arquivo 'done.txt'")
     print(err)
     return False
 
@@ -403,7 +403,7 @@ def fazer(num):
   linhas = fp.readlines()
   fp.close()
   if num > len(linhas) or num < 0:
-    print("Não existe atividade com o número " + str(num + 1)+ " na lista")
+    print("Nao existe atividade com o numero " + str(num + 1)+ " na lista")
     return
   listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
   adicionarFeito(listaOrdenada[num][0], listaOrdenada[num][1])
@@ -417,7 +417,7 @@ def remover(num):
   linhas = fp.readlines()
   fp.close()
   if num > len(linhas) or num < 0:
-    print("Não existe atividade com o número " + str(num + 1)+ " na lista")
+    print("Nao existe atividade com o numero " + str(num + 1)+ " na lista")
     return
   listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
   listaOrdenada.pop(num)
@@ -440,7 +440,7 @@ def priorizar(num, prioridade):
   fp.close()
   listaOrdenada = ordenarPorPrioridade(ordenarPorDataHora(organizar(linhas)))
   if num > len(linhas) or num < 0:
-    print("Não existe atividade com o número " + str(num + 1)+ " na lista")
+    print("Nao existe atividade com o numero " + str(num + 1)+ " na lista")
     return
   #adicionar à lista a atividade modificada e depois remover a atividade 
   listaOrdenada.append((listaOrdenada[num][0], (listaOrdenada[num][1][0], listaOrdenada[num][1][1], prioridade, listaOrdenada[num][1][3], listaOrdenada[num][1][4])))
@@ -486,7 +486,7 @@ def processarComandos(comandos) :
       elif dataValida(comandos[0]):
         listarData(comandos[0])
       else:
-        print('comando inválido.')
+        print('comando invalido.')
     return
   
   elif comandos[1] == REMOVER:
@@ -512,10 +512,10 @@ def processarComandos(comandos) :
     if prioridadeValida(prioridade):
       priorizar(num, prioridade)
       return
-    print('Prioriade Inválida.')
+    print('Prioriade Invalida.')
     return  
   else :
-    print("Comando inválido.")
+    print("Comando invalido.")
     return
 
 def listarPrioridade(pri):
